@@ -97,6 +97,12 @@ struct CruciblePersonalResult: Decodable {
     }
 }
 
+extension CruciblePersonalResult: CustomStringConvertible {
+    var description: String {
+        return "Date: \(period), Score: \(score), Kills: \(kills), Deaths: \(deaths), Assists: \(assists)"
+    }
+}
+
 extension CruciblePersonalResult {
     enum CodingKeys: String, CodingKey {
         case period

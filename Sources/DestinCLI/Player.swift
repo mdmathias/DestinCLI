@@ -36,7 +36,7 @@ extension Player: CustomStringConvertible {
 
 extension Player {
     struct Profile: Decodable {
-        let characterIDs: [Int]
+        let characterIDs: [String]
         
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Profile.CodingKeys.self)
@@ -46,7 +46,7 @@ extension Player {
                                                         forKey: .profile)
             let data = try profile.nestedContainer(keyedBy: Profile.CodingKeys.self,
                                                    forKey: .data)
-            self.characterIDs = try data.decode([Int].self, forKey: .characterIds)
+            self.characterIDs = try data.decode([String].self, forKey: .characterIds)
         }
     }
 }

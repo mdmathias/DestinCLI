@@ -52,10 +52,11 @@ struct APIClient {
     }
     
     func getProfile(
-        for player: Player,
+        membershipType: Int,
+        membershipId: String,
         completion: @escaping (Result<Player.Profile, APIClient.Error>) -> Void)
     {
-        let urlString = "https://www.bungie.net/Platform/Destiny2/\(player.membershipType)/Profile/\(player.membershipId)/?components=100"
+        let urlString = "https://www.bungie.net/Platform/Destiny2/\(membershipType)/Profile/\(membershipId)/?components=100"
         
         let req = request(with: urlString)
         let task = session.dataTask(with: req) { (data, response, error) in
@@ -73,20 +74,21 @@ struct APIClient {
     }
     
     func activityHistory(
-        for player: Player,
-        characterId: Int,
+        membershipType: Int,
+        membershipId: String,
+        characterId: String,
         completion: @escaping (Result<[CruciblePersonalResult], APIClient.Error>) -> Void)
     {
         // TODO: Figure out a way to get the mode in the query string
         // TODO: Figure out a way to keep paging for data until you have it all
-        let urlString = "https://www.bungie.net/Platform/Destiny2/\(player.membershipType)/Account/\(player.membershipId)/Character/\(characterId)/Stats/Activities/?modes=73&page=\(currentPage)"
+        let urlString = "https://www.bungie.net/Platform/Destiny2/\(membershipType)/Account/\(membershipId)/Character/\(characterId)/Stats/Activities/?modes=73&page=\(currentPage)"
         let req = request(with: urlString)
         let task = session.dataTask(with: req) { (data, response, error) in
             guard let data = data else { return completion(.failure(.noData)) }
             do {
-                let activities = try jsonDecoder.decode([CruciblePersonalResult].self,
-                                                        from: data)
-                completion(.success(activities))
+                let response = try jsonDecoder.decode(ActivityResponse.self,
+                                                      from: data)
+                completion(.success(response.activities))
             } catch {
                 // If we get here, it could be because we couldn't decode data
                 // due to the `currentPage` being set beyond the last valid page
@@ -99,7 +101,7 @@ struct APIClient {
         sema.wait()
     }
     
-    // TODO: Get character ids for a given player account
+    // TODO: Get character info for a character id
     // https://github.com/vpzed/Destiny2-API-Info/wiki/API-Introduction-Part-2-Account-Concepts#more-api-requests
 }
 
